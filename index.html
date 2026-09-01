@@ -3,276 +3,474 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>The History of Cars</title>
+  <title>Chronicles of the Automobile</title>
   <style>
-    /* Reset & Base Styles */
-    * {
+    /* ==========================================
+       1. GLOBAL RESET & BASE STYLES
+       ========================================== */
+    *, *::before, *::after {
       box-sizing: border-box;
       margin: 0;
       padding: 0;
     }
 
-    body {
-      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-      background-color: #0b0c10;
-      color: #ffffff;
-      overflow-x: hidden;
-    }
-
-    /* Fixed Background Layer */
-    .bg-container {
-      position: fixed;
-      top: 0;
-      left: 0;
-      width: 100vw;
-      height: 100vh;
-      z-index: -1;
-      overflow: hidden;
-    }
-
-    .bg-video {
-      position: absolute;
-      top: 0;
-      left: 0;
+    html, body {
       width: 100%;
       height: 100%;
-      object-fit: cover;
-      opacity: 0;
-      transition: opacity 0.8s cubic-bezier(0.25, 1, 0.5, 1), transform 0.8s cubic-bezier(0.25, 1, 0.5, 1);
-      transform: scale(1.08);
-      filter: brightness(0.65);
+      background-color: #050608;
+      color: #f1f5f9;
+      font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+      overflow-x: hidden;
+      scroll-behavior: smooth;
     }
 
-    .bg-video.active {
-      opacity: 1;
-      transform: scale(1);
-    }
-
-    /* Overlay Gradient for Better Text Readability */
-    .overlay {
+    /* ==========================================
+       2. FULL-SCREEN BACKGROUND CANVAS & OVERLAYS
+       ========================================== */
+    #bg-canvas {
       position: fixed;
       top: 0;
       left: 0;
       width: 100vw;
       height: 100vh;
-      background: linear-gradient(180deg, rgba(0,0,0,0.4) 0%, rgba(0,0,0,0.2) 50%, rgba(0,0,0,0.7) 100%);
       z-index: 0;
       pointer-events: none;
     }
 
-    /* Fixed Minimal Header */
+    .vignette {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100vw;
+      height: 100vh;
+      z-index: 1;
+      pointer-events: none;
+      background: radial-gradient(circle at center, rgba(5,6,8,0.2) 0%, rgba(5,6,8,0.85) 70%, rgba(5,6,8,0.98) 100%);
+    }
+
+    .grid-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100vw;
+      height: 100vh;
+      z-index: 1;
+      pointer-events: none;
+      background-image: linear-gradient(rgba(255, 255, 255, 0.03) 1px, transparent 1px),
+                        linear-gradient(90deg, rgba(255, 255, 255, 0.03) 1px, transparent 1px);
+      background-size: 80px 80px;
+      opacity: 0.4;
+    }
+
+    /* ==========================================
+       3. NAVIGATION & UI COMPONENTS
+       ========================================== */
     header {
       position: fixed;
       top: 0;
       left: 0;
       width: 100%;
-      padding: 30px 50px;
+      padding: 30px 60px;
       display: flex;
       justify-content: space-between;
       align-items: center;
-      z-index: 10;
+      z-index: 100;
     }
 
-    .logo {
+    .brand-title {
+      font-size: 0.85rem;
       font-weight: 700;
-      letter-spacing: 2px;
-      font-size: 0.9rem;
+      letter-spacing: 0.35em;
       text-transform: uppercase;
-    }
-
-    /* Scrollable Story Content Sections */
-    .scroll-container {
-      position: relative;
-      z-index: 1;
-    }
-
-    .section {
-      height: 100vh;
+      color: #ffffff;
       display: flex;
       align-items: center;
-      padding: 0 10%;
+      gap: 12px;
     }
 
-    .content-card {
-      max-width: 550px;
-      opacity: 0;
-      transform: translateY(40px);
-      transition: all 0.8s cubic-bezier(0.16, 1, 0.3, 1);
-      backdrop-filter: blur(12px);
-      -webkit-backdrop-filter: blur(12px);
-      background: rgba(255, 255, 255, 0.05);
-      border: 1px solid rgba(255, 255, 255, 0.12);
-      padding: 40px;
-      border-radius: 16px;
-      box-shadow: 0 30px 60px rgba(0,0,0,0.4);
-    }
-
-    .section.active .content-card {
-      opacity: 1;
-      transform: translateY(0);
-    }
-
-    .era-tag {
+    .brand-title::before {
+      content: '';
       display: inline-block;
-      font-size: 0.75rem;
-      font-weight: 600;
-      letter-spacing: 3px;
-      text-transform: uppercase;
-      color: #e5a93c;
-      margin-bottom: 12px;
+      width: 8px;
+      height: 8px;
+      background-color: #3b82f6;
+      border-radius: 50%;
+      box-shadow: 0 0 12px #3b82f6;
     }
 
-    h2 {
-      font-size: 2.5rem;
-      font-weight: 600;
-      line-height: 1.2;
-      margin-bottom: 16px;
+    .nav-tracker {
+      font-size: 0.8rem;
+      font-family: monospace;
+      letter-spacing: 0.15em;
+      color: #94a3b8;
     }
 
-    p {
-      font-size: 1.05rem;
-      line-height: 1.6;
-      color: #d1d5db;
-    }
-
-    /* Side Navigation Indicator */
-    .nav-dots {
+    .dot-navigation {
       position: fixed;
-      right: 40px;
+      right: 50px;
       top: 50%;
       transform: translateY(-50%);
       display: flex;
       flex-direction: column;
-      gap: 16px;
-      z-index: 10;
+      gap: 20px;
+      z-index: 100;
     }
 
-    .dot {
-      width: 8px;
-      height: 8px;
+    .nav-dot {
+      width: 10px;
+      height: 10px;
       border-radius: 50%;
-      background: rgba(255, 255, 255, 0.3);
-      transition: all 0.4s ease;
+      border: 2px solid rgba(255, 255, 255, 0.3);
+      background: transparent;
       cursor: pointer;
+      transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
     }
 
-    .dot.active {
-      background: #ffffff;
-      transform: scale(1.6);
+    .nav-dot.active {
+      border-color: #3b82f6;
+      background: #3b82f6;
+      transform: scale(1.5);
+      box-shadow: 0 0 15px rgba(59, 130, 246, 0.8);
+    }
+
+    /* ==========================================
+       4. SCROLLABLE STORY SECTIONS
+       ========================================== */
+    .story-container {
+      position: relative;
+      z-index: 10;
+      width: 100%;
+    }
+
+    .story-section {
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      padding: 0 12%;
+    }
+
+    .story-card {
+      max-width: 620px;
+      background: rgba(15, 23, 42, 0.55);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      padding: 50px;
+      border-radius: 24px;
+      box-shadow: 0 30px 60px rgba(0, 0, 0, 0.6);
+      opacity: 0;
+      transform: translateY(60px) scale(0.96);
+      transition: all 0.9s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    .story-section.active .story-card {
+      opacity: 1;
+      transform: translateY(0) scale(1);
+    }
+
+    .era-badge {
+      display: inline-block;
+      padding: 6px 14px;
+      border-radius: 20px;
+      font-size: 0.72rem;
+      font-weight: 700;
+      letter-spacing: 0.25em;
+      text-transform: uppercase;
+      background: rgba(59, 130, 246, 0.15);
+      color: #60a5fa;
+      border: 1px solid rgba(59, 130, 246, 0.3);
+      margin-bottom: 24px;
+    }
+
+    h2.era-title {
+      font-size: 2.8rem;
+      font-weight: 700;
+      line-height: 1.15;
+      margin-bottom: 20px;
+      color: #ffffff;
+      letter-spacing: -0.02em;
+    }
+
+    p.era-description {
+      font-size: 1.1rem;
+      line-height: 1.7;
+      color: #cbd5e1;
+      margin-bottom: 28px;
+    }
+
+    .era-stats {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 20px;
+      padding-top: 24px;
+      border-top: 1px solid rgba(255, 255, 255, 0.08);
+    }
+
+    .stat-item .stat-value {
+      font-size: 1.3rem;
+      font-weight: 700;
+      color: #f8fafc;
+    }
+
+    .stat-item .stat-label {
+      font-size: 0.75rem;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      color: #64748b;
+      margin-top: 4px;
+    }
+
+    /* Responsive Adjustments */
+    @media (max-width: 768px) {
+      header { padding: 20px 30px; }
+      .story-section { padding: 0 6%; }
+      .story-card { padding: 30px; }
+      h2.era-title { font-size: 2rem; }
+      .dot-navigation { right: 20px; }
     }
   </style>
 </head>
 <body>
 
+  <!-- Fullscreen Dynamic Canvas Background -->
+  <canvas id="bg-canvas"></canvas>
+  <div class="vignette"></div>
+  <div class="grid-overlay"></div>
+
+  <!-- Header UI -->
   <header>
-    <div class="logo">Automotive Chronicle</div>
+    <div class="brand-title">Automotive History</div>
+    <div class="nav-tracker" id="tracker">01 / 05</div>
   </header>
 
-  <!-- Background Video Layers -->
-  <div class="bg-container">
-    <!-- Replace source URLs with your own car history MP4 video files -->
-    <video class="bg-video active" id="bg-0" autoplay loop muted playsinline>
-      <source src="https://assets.mixkit.co/videos/preview/mixkit-vintage-car-driving-on-a-road-41551-large.mp4" type="video/mp4" />
-    </video>
-    <video class="bg-video" id="bg-1" autoplay loop muted playsinline>
-      <source src="https://assets.mixkit.co/videos/preview/mixkit-classic-red-car-driving-on-a-road-41549-large.mp4" type="video/mp4" />
-    </video>
-    <video class="bg-video" id="bg-2" autoplay loop muted playsinline>
-      <source src="https://assets.mixkit.co/videos/preview/mixkit-luxury-black-car-driving-along-a-forest-41547-large.mp4" type="video/mp4" />
-    </video>
-    <video class="bg-video" id="bg-3" autoplay loop muted playsinline>
-      <source src="https://assets.mixkit.co/videos/preview/mixkit-charging-an-electric-car-42642-large.mp4" type="video/mp4" />
-    </video>
-  </div>
-
-  <div class="overlay"></div>
-
-  <!-- Side Navigation Dots -->
-  <div class="nav-dots">
-    <div class="dot active" onclick="scrollToSection(0)"></div>
-    <div class="dot" onclick="scrollToSection(1)"></div>
-    <div class="dot" onclick="scrollToSection(2)"></div>
-    <div class="dot" onclick="scrollToSection(3)"></div>
+  <!-- Side Dot Navigation -->
+  <div class="dot-navigation">
+    <div class="nav-dot active" onclick="jumpToSection(0)"></div>
+    <div class="nav-dot" onclick="jumpToSection(1)"></div>
+    <div class="nav-dot" onclick="jumpToSection(2)"></div>
+    <div class="nav-dot" onclick="jumpToSection(3)"></div>
+    <div class="nav-dot" onclick="jumpToSection(4)"></div>
   </div>
 
   <!-- Main Scrollable Story Content -->
-  <div class="scroll-container">
-    <section class="section active" data-index="0">
-      <div class="content-card">
-        <span class="era-tag">1886 – 1910s</span>
-        <h2>The Dawn of Motion</h2>
-        <p>In 1886, Karl Benz patented the Motorwagen, widely regarded as the first modern automobile. Powered by a single-cylinder four-stroke engine, it forever changed human transport.</p>
+  <div class="story-container">
+    
+    <!-- Section 1 -->
+    <section class="story-section active" data-index="0">
+      <div class="story-card">
+        <span class="era-badge">1886 – 1905</span>
+        <h2 class="era-title">The Dawn of Mechanics</h2>
+        <p class="era-description">Karl Benz introduced the Patent-Motorwagen in 1886, marking the genesis of modern automotive travel. Early vehicles operated on single-cylinder internal combustion engines with primitive steering tillers.</p>
+        <div class="era-stats">
+          <div class="stat-item">
+            <div class="stat-value">16 km/h</div>
+            <div class="stat-label">Top Speed</div>
+          </div>
+          <div class="stat-item">
+            <div class="stat-value">0.75 hp</div>
+            <div class="stat-label">Power Output</div>
+          </div>
+        </div>
       </div>
     </section>
 
-    <section class="section" data-index="1">
-      <div class="content-card">
-        <span class="era-tag">1920s – 1950s</span>
-        <h2>Mass Production & Muscle</h2>
-        <p>Henry Ford revolutionized manufacturing with the moving assembly line for the Model T. Automobiles transitioned from luxury toys for the rich to essential everyday tools.</p>
+    <!-- Section 2 -->
+    <section class="story-section" data-index="1">
+      <div class="story-card">
+        <span class="era-badge">1908 – 1930s</span>
+        <h2 class="era-title">Assembly & Modernization</h2>
+        <p class="era-description">Henry Ford revolutionized industrial manufacturing by establishing moving assembly lines for the Model T. The automobile transformed rapidly from an exclusive luxury into an accessible daily staple.</p>
+        <div class="era-stats">
+          <div class="stat-item">
+            <div class="stat-value">15 Million</div>
+            <div class="stat-label">Units Produced</div>
+          </div>
+          <div class="stat-item">
+            <div class="stat-value">93 Mins</div>
+            <div class="stat-label">Build Time</div>
+          </div>
+        </div>
       </div>
     </section>
 
-    <section class="section" data-index="2">
-      <div class="content-card">
-        <span class="era-tag">1960s – 1990s</span>
-        <h2>The Supercar Era</h2>
-        <p>Aerodynamic design, turbochargers, and high-performance engineering took center stage. Iconic names like Ferrari, Lamborghini, and Porsche redefined speed and style.</p>
+    <!-- Section 3 -->
+    <section class="story-section" data-index="2">
+      <div class="story-card">
+        <span class="era-badge">1950s – 1970s</span>
+        <h2 class="era-title">The Golden Muscle Era</h2>
+        <p class="era-description">Post-war engineering focused on bold aesthetic tailoring, raw horsepower, and transatlantic stylistic flair. V8 engines, chrome trim, and aerodynamic fins defined street presence.</p>
+        <div class="era-stats">
+          <div class="stat-item">
+            <div class="stat-value">426 cu in</div>
+            <div class="stat-label">Hemi Displacement</div>
+          </div>
+          <div class="stat-item">
+            <div class="stat-value">425 hp</div>
+            <div class="stat-label">Peak Performance</div>
+          </div>
+        </div>
       </div>
     </section>
 
-    <section class="section" data-index="3">
-      <div class="content-card">
-        <span class="era-tag">2000s – Present</span>
-        <h2>Electric & Autonomous</h2>
-        <p>The modern era focuses on sustainability and intelligence. High-density batteries, electric drivetrains, and AI-assisted driving lead the next transformation.</p>
+    <!-- Section 4 -->
+    <section class="story-section" data-index="3">
+      <div class="story-card">
+        <span class="era-badge">1980s – 2000s</span>
+        <h2 class="era-title">Precision & Supercars</h2>
+        <p class="era-description">Digital fuel injection, turbocharging, and advanced carbon construction redefined velocity. Icons like the Ferrari F40 and McLaren F1 established peak mechanical thresholds.</p>
+        <div class="era-stats">
+          <div class="stat-item">
+            <div class="stat-value">386 km/h</div>
+            <div class="stat-label">World Speed Record</div>
+          </div>
+          <div class="stat-item">
+            <div class="stat-value">6.1L V12</div>
+            <div class="stat-label">Engine Layout</div>
+          </div>
+        </div>
       </div>
     </section>
+
+    <!-- Section 5 -->
+    <section class="story-section" data-index="4">
+      <div class="story-card">
+        <span class="era-badge">2010s – Present</span>
+        <h2 class="era-title">Electric & AI Mobility</h2>
+        <p class="era-description">Instant torque, solid-state battery architecture, and autonomous driving networks define current engineering. Vehicles are evolving into software-driven computing platforms on wheels.</p>
+        <div class="era-stats">
+          <div class="stat-item">
+            <div class="stat-value">1.9 Sec</div>
+            <div class="stat-label">0-100 km/h</div>
+          </div>
+          <div class="stat-item">
+            <div class="stat-value">1000+ hp</div>
+            <div class="stat-label">Electric Output</div>
+          </div>
+        </div>
+      </div>
+    </section>
+
   </div>
 
   <script>
-    const sections = document.querySelectorAll('.section');
-    const bgVideos = document.querySelectorAll('.bg-video');
-    const dots = document.querySelectorAll('.dot');
+    /* ==========================================
+       BACKGROUND CANVAS ENGINE (NO VIDEO DEPENDENCY)
+       ========================================== */
+    const canvas = document.getElementById('bg-canvas');
+    const ctx = canvas.getContext('2d');
 
-    let currentIndex = 0;
+    let width, height;
+    let particles = [];
+    let targetHue = 210;
+    let currentHue = 210;
 
-    // IntersectionObserver to detect which section is currently visible on scroll
+    function resize() {
+      width = canvas.width = window.innerWidth;
+      height = canvas.height = window.innerHeight;
+    }
+
+    window.addEventListener('resize', resize);
+    resize();
+
+    // Generate procedural particle universe
+    class Particle {
+      constructor() {
+        this.reset();
+      }
+
+      reset() {
+        this.x = Math.random() * width;
+        this.y = Math.random() * height;
+        this.z = Math.random() * 2 + 0.5;
+        this.size = Math.random() * 2 + 1;
+        this.vx = (Math.random() - 0.5) * 0.5;
+        this.vy = (Math.random() - 0.5) * 0.5;
+        this.alpha = Math.random() * 0.5 + 0.2;
+      }
+
+      update(scrollProgress) {
+        this.x += this.vx * this.z;
+        this.y += this.vy * this.z + (scrollProgress * 0.2);
+
+        if (this.x < 0 || this.x > width || this.y < 0 || this.y > height) {
+          this.reset();
+        }
+      }
+
+      draw() {
+        ctx.beginPath();
+        ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
+        ctx.fillStyle = `hsla(${currentHue}, 70%, 60%, ${this.alpha})`;
+        ctx.shadowBlur = 10;
+        ctx.shadowColor = `hsla(${currentHue}, 80%, 50%, 0.5)`;
+        ctx.fill();
+      }
+    }
+
+    for (let i = 0; i < 150; i++) {
+      particles.push(new Particle());
+    }
+
+    // Dynamic background hues mapped to eras
+    const eraHues = [210, 25, 350, 280, 160];
+
+    function renderCanvas() {
+      // Smooth color transitions on scroll
+      currentHue += (targetHue - currentHue) * 0.05;
+
+      // Deep dark background with subtle hue glow
+      ctx.fillStyle = `hsla(${currentHue}, 30%, 4%, 0.2)`;
+      ctx.fillRect(0, 0, width, height);
+
+      const scrollProgress = window.scrollY / (document.body.scrollHeight - window.innerHeight);
+
+      particles.forEach(p => {
+        p.update(scrollProgress);
+        p.draw();
+      });
+
+      requestAnimationFrame(renderCanvas);
+    }
+
+    renderCanvas();
+
+    /* ==========================================
+       SCROLL OBSERVER & TRANSITION CONTROLLER
+       ========================================== */
+    const sections = document.querySelectorAll('.story-section');
+    const dots = document.querySelectorAll('.nav-dot');
+    const tracker = document.getElementById('tracker');
+
     const observerOptions = {
       root: null,
-      threshold: 0.5 // Triggers transition when 50% of section is visible
+      threshold: 0.5
     };
 
     const observer = new IntersectionObserver((entries) => {
-      entries.forEach((entry) => {
+      entries.forEach(entry => {
         if (entry.isIntersecting) {
           const index = parseInt(entry.target.getAttribute('data-index'));
-          updateActiveState(index);
+          
+          // Update active sections
+          sections.forEach(s => s.classList.remove('active'));
+          entry.target.classList.add('active');
+
+          // Update active dots
+          dots.forEach(d => d.classList.remove('active'));
+          dots[index].classList.add('active');
+
+          // Update header tracker
+          tracker.textContent = `0${index + 1} / 05`;
+
+          // Shift background color landscape smoothly
+          targetHue = eraHues[index];
         }
       });
     }, observerOptions);
 
-    sections.forEach((section) => observer.observe(section));
+    sections.forEach(s => observer.observe(s));
 
-    function updateActiveState(index) {
-      if (index === currentIndex) return;
-      
-      // Update text card animations
-      sections[currentIndex].classList.remove('active');
-      sections[index].classList.add('active');
-
-      // Update background video with smooth opacity crossfade
-      bgVideos[currentIndex].classList.remove('active');
-      bgVideos[index].classList.add('active');
-
-      // Update navigation indicators
-      dots[currentIndex].classList.remove('active');
-      dots[index].classList.add('active');
-
-      currentIndex = index;
-    }
-
-    function scrollToSection(index) {
+    function jumpToSection(index) {
       sections[index].scrollIntoView({ behavior: 'smooth' });
     }
   </script>
