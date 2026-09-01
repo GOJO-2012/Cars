@@ -1,0 +1,280 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>The History of Cars</title>
+  <style>
+    /* Reset & Base Styles */
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+      background-color: #0b0c10;
+      color: #ffffff;
+      overflow-x: hidden;
+    }
+
+    /* Fixed Background Layer */
+    .bg-container {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100vw;
+      height: 100vh;
+      z-index: -1;
+      overflow: hidden;
+    }
+
+    .bg-video {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      opacity: 0;
+      transition: opacity 0.8s cubic-bezier(0.25, 1, 0.5, 1), transform 0.8s cubic-bezier(0.25, 1, 0.5, 1);
+      transform: scale(1.08);
+      filter: brightness(0.65);
+    }
+
+    .bg-video.active {
+      opacity: 1;
+      transform: scale(1);
+    }
+
+    /* Overlay Gradient for Better Text Readability */
+    .overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100vw;
+      height: 100vh;
+      background: linear-gradient(180deg, rgba(0,0,0,0.4) 0%, rgba(0,0,0,0.2) 50%, rgba(0,0,0,0.7) 100%);
+      z-index: 0;
+      pointer-events: none;
+    }
+
+    /* Fixed Minimal Header */
+    header {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      padding: 30px 50px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      z-index: 10;
+    }
+
+    .logo {
+      font-weight: 700;
+      letter-spacing: 2px;
+      font-size: 0.9rem;
+      text-transform: uppercase;
+    }
+
+    /* Scrollable Story Content Sections */
+    .scroll-container {
+      position: relative;
+      z-index: 1;
+    }
+
+    .section {
+      height: 100vh;
+      display: flex;
+      align-items: center;
+      padding: 0 10%;
+    }
+
+    .content-card {
+      max-width: 550px;
+      opacity: 0;
+      transform: translateY(40px);
+      transition: all 0.8s cubic-bezier(0.16, 1, 0.3, 1);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      padding: 40px;
+      border-radius: 16px;
+      box-shadow: 0 30px 60px rgba(0,0,0,0.4);
+    }
+
+    .section.active .content-card {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    .era-tag {
+      display: inline-block;
+      font-size: 0.75rem;
+      font-weight: 600;
+      letter-spacing: 3px;
+      text-transform: uppercase;
+      color: #e5a93c;
+      margin-bottom: 12px;
+    }
+
+    h2 {
+      font-size: 2.5rem;
+      font-weight: 600;
+      line-height: 1.2;
+      margin-bottom: 16px;
+    }
+
+    p {
+      font-size: 1.05rem;
+      line-height: 1.6;
+      color: #d1d5db;
+    }
+
+    /* Side Navigation Indicator */
+    .nav-dots {
+      position: fixed;
+      right: 40px;
+      top: 50%;
+      transform: translateY(-50%);
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+      z-index: 10;
+    }
+
+    .dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: rgba(255, 255, 255, 0.3);
+      transition: all 0.4s ease;
+      cursor: pointer;
+    }
+
+    .dot.active {
+      background: #ffffff;
+      transform: scale(1.6);
+    }
+  </style>
+</head>
+<body>
+
+  <header>
+    <div class="logo">Automotive Chronicle</div>
+  </header>
+
+  <!-- Background Video Layers -->
+  <div class="bg-container">
+    <!-- Replace source URLs with your own car history MP4 video files -->
+    <video class="bg-video active" id="bg-0" autoplay loop muted playsinline>
+      <source src="https://assets.mixkit.co/videos/preview/mixkit-vintage-car-driving-on-a-road-41551-large.mp4" type="video/mp4" />
+    </video>
+    <video class="bg-video" id="bg-1" autoplay loop muted playsinline>
+      <source src="https://assets.mixkit.co/videos/preview/mixkit-classic-red-car-driving-on-a-road-41549-large.mp4" type="video/mp4" />
+    </video>
+    <video class="bg-video" id="bg-2" autoplay loop muted playsinline>
+      <source src="https://assets.mixkit.co/videos/preview/mixkit-luxury-black-car-driving-along-a-forest-41547-large.mp4" type="video/mp4" />
+    </video>
+    <video class="bg-video" id="bg-3" autoplay loop muted playsinline>
+      <source src="https://assets.mixkit.co/videos/preview/mixkit-charging-an-electric-car-42642-large.mp4" type="video/mp4" />
+    </video>
+  </div>
+
+  <div class="overlay"></div>
+
+  <!-- Side Navigation Dots -->
+  <div class="nav-dots">
+    <div class="dot active" onclick="scrollToSection(0)"></div>
+    <div class="dot" onclick="scrollToSection(1)"></div>
+    <div class="dot" onclick="scrollToSection(2)"></div>
+    <div class="dot" onclick="scrollToSection(3)"></div>
+  </div>
+
+  <!-- Main Scrollable Story Content -->
+  <div class="scroll-container">
+    <section class="section active" data-index="0">
+      <div class="content-card">
+        <span class="era-tag">1886 – 1910s</span>
+        <h2>The Dawn of Motion</h2>
+        <p>In 1886, Karl Benz patented the Motorwagen, widely regarded as the first modern automobile. Powered by a single-cylinder four-stroke engine, it forever changed human transport.</p>
+      </div>
+    </section>
+
+    <section class="section" data-index="1">
+      <div class="content-card">
+        <span class="era-tag">1920s – 1950s</span>
+        <h2>Mass Production & Muscle</h2>
+        <p>Henry Ford revolutionized manufacturing with the moving assembly line for the Model T. Automobiles transitioned from luxury toys for the rich to essential everyday tools.</p>
+      </div>
+    </section>
+
+    <section class="section" data-index="2">
+      <div class="content-card">
+        <span class="era-tag">1960s – 1990s</span>
+        <h2>The Supercar Era</h2>
+        <p>Aerodynamic design, turbochargers, and high-performance engineering took center stage. Iconic names like Ferrari, Lamborghini, and Porsche redefined speed and style.</p>
+      </div>
+    </section>
+
+    <section class="section" data-index="3">
+      <div class="content-card">
+        <span class="era-tag">2000s – Present</span>
+        <h2>Electric & Autonomous</h2>
+        <p>The modern era focuses on sustainability and intelligence. High-density batteries, electric drivetrains, and AI-assisted driving lead the next transformation.</p>
+      </div>
+    </section>
+  </div>
+
+  <script>
+    const sections = document.querySelectorAll('.section');
+    const bgVideos = document.querySelectorAll('.bg-video');
+    const dots = document.querySelectorAll('.dot');
+
+    let currentIndex = 0;
+
+    // IntersectionObserver to detect which section is currently visible on scroll
+    const observerOptions = {
+      root: null,
+      threshold: 0.5 // Triggers transition when 50% of section is visible
+    };
+
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach((entry) => {
+        if (entry.isIntersecting) {
+          const index = parseInt(entry.target.getAttribute('data-index'));
+          updateActiveState(index);
+        }
+      });
+    }, observerOptions);
+
+    sections.forEach((section) => observer.observe(section));
+
+    function updateActiveState(index) {
+      if (index === currentIndex) return;
+      
+      // Update text card animations
+      sections[currentIndex].classList.remove('active');
+      sections[index].classList.add('active');
+
+      // Update background video with smooth opacity crossfade
+      bgVideos[currentIndex].classList.remove('active');
+      bgVideos[index].classList.add('active');
+
+      // Update navigation indicators
+      dots[currentIndex].classList.remove('active');
+      dots[index].classList.add('active');
+
+      currentIndex = index;
+    }
+
+    function scrollToSection(index) {
+      sections[index].scrollIntoView({ behavior: 'smooth' });
+    }
+  </script>
+</body>
+</html>
